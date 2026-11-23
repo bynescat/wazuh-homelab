@@ -1,6 +1,4 @@
 
-This project demonstrates the deployment of a centralized Security Information and Event Management (SIEM) and Extended Detection and Response (XDR) platform using **Wazuh 4.14.8** running entirely in Docker containers. The environment is configured to aggregate endpoint telemetry, monitor system integrity, and enable real-time threat detection mapped to the **MITRE ATT&CK** matrix.
-
 ## Deployment & Installation Overview
 
 ### 1. System Requirements & Lab Environment
