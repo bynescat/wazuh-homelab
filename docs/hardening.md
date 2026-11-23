@@ -440,7 +440,7 @@ sudo iptables -S DOCKER-USER
 
 The `nc` test was repeated a final time. Expected: the connection succeeds again.
 
-**Output of nc -zvw3 <HOST_LAN_IP> 1514**
+**Output of `nc -zvw3 <HOST_LAN_IP> 1514`**
 
 ```text
 Connection to <HOST_LAN_IP> port 1514 [tcp/fujitsu-dtcns] succeeded!
