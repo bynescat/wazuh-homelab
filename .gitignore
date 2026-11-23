@@ -1,0 +1,12 @@
+# Ignore local environment secrets
+.env
+
+# Allow the template file to be tracked by git
+!.env.example
+
+# Ignore generated certs, logs, and backups
+config/wazuh_indexer/certs/
+*.pem
+*.key
+*.bak
+*.txt
