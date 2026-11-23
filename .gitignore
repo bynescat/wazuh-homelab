@@ -1,9 +1,15 @@
-# Ignore local environment secrets
+# Local environment secrets
 .env
 
-# Ignore generated certs, logs, and backups
-config/wazuh_indexer/certs/
+# Generated certificates and keys
+config/wazuh_indexer_ssl_certs/
 *.pem
 *.key
+*.crt
+*.csr
+*.srl
+
+# Logs and backups
+*.log
 *.bak
 *.txt
