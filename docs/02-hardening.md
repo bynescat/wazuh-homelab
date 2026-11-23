@@ -1,3 +1,7 @@
+# Hardening of the Wazuh deployment
+
+The single-node Wazuh stack from [01 Wazuh setup](01-wazuh-setup.md) was hardened in three steps: the default credentials were replaced, the network exposure of the published ports was reduced, and the result was verified from a second device. Unless stated otherwise, all commands were run on the host in the directory `~/wazuh-docker/single-node`.
+
 
 ## Security Considerations
 
@@ -11,15 +15,20 @@ The default single-node deployment publishes all service ports on every network 
 
 - **Dashboard access:** The web interface (443/TCP) uses a self-signed certificate generated during initial setup. For long-term use, a certificate issued by a trusted CA would be preferable, and access would ideally be limited to administrative hosts.
 
-
 ## Hardening Plan
 
-The hardening proceeds in the following order: credentials first, then reduction of network exposure, followed by verification of the result and the addition of an agent to confirm that detection works.
+The hardening proceeded in the following order: credentials first, then reduction of the network exposure, followed by verification of the result. Agents that confirm that detection works were added afterwards (see [03 Monitored VM](03-monitored-vm.md) and [04 Wazuh agent](04-wazuh-agent.md)).
 
 
 ### 1. Change of default credentials
 
-Replacing the default credentials is the most important measure. The procedure below was carried out for the `admin` user only. The `kibanaserver` user is changed in the same way (new hash in `internal_users.yml`, `DASHBOARD_PASSWORD` in `docker-compose.yml`, then `securityadmin.sh`). The `wazuh-wui` API user is a Wazuh API user and is changed through a different procedure (Wazuh API or dashboard, then `API_PASSWORD` in `docker-compose.yml` and `config/wazuh_dashboard/wazuh.yml`). Both users still use their default credentials in this lab.
+Replacing the default credentials is the most important measure. Two of the three default accounts were replaced in this lab:
+
+- **`admin` (indexer user):** the password and its hash were replaced. The procedure is described in the following sections (new hash in `config/wazuh_indexer/internal_users.yml` and new password in `INDEXER_PASSWORD` in `docker-compose.yml`, then applying the change in the indexer with `securityadmin.sh`).
+- **`wazuh-wui` (API user):** this is a Wazuh API user and is changed through a different procedure (new password in `config/wazuh_dashboard/wazuh.yml` and in `API_PASSWORD`, then recreating the containers). It was changed because the API is used by the scripts of [06 Automation and dashboards](06-automation-and-dashboards.md). The procedure is described in the section "Changing the password of the API user".
+- **`kibanaserver` (dashboard service user):** not changed in this lab (see the summary). It would be changed in the same way as `admin`: new hash in `internal_users.yml`, `DASHBOARD_PASSWORD` in `docker-compose.yml`, then `securityadmin.sh`.
+
+#### Backups and password entry
 
 Before modifying configuration files, backups were created to serve as a safety net in case of syntax or configuration errors:
 
@@ -112,6 +121,30 @@ bash /usr/share/wazuh-indexer/plugins/opensearch-security/tools/securityadmin.sh
    The web dashboard (https://localhost) was accessed, and authentication with the new administrator credentials succeeded.
 
 
+#### Changing the password of the API user
+
+The user `wazuh-wui` is used by the dashboard to talk to the manager API and by the scripts of chapter 06. Its default password is published in the Wazuh documentation, so it was replaced as well. Backups of the two files that contain it were created first:
+
+```bash
+cp .env .env.bak
+cp config/wazuh_dashboard/wazuh.yml config/wazuh_dashboard/wazuh.yml.bak
+```
+
+The new password was entered in two places:
+
+- **`API_PASSWORD` in `.env`:** the compose file refers to this variable as `${API_PASSWORD}` in both the `wazuh.manager` and the `wazuh.dashboard` service.
+- **`password` in `config/wazuh_dashboard/wazuh.yml`:** the entry under `username: wazuh-wui`, which the dashboard uses to connect to the API.
+
+The containers were then recreated, and their status was checked:
+
+```bash
+docker compose down
+docker compose up -d
+docker compose ps
+```
+
+All three containers were running. The change was verified with a login to the API using the new password, which returned a token (see [06 Automation and dashboards](06-automation-and-dashboards.md)).
+
 
 ### 2. Restriction of Network Exposure
 
@@ -130,6 +163,7 @@ The network exposure was reduced in three layers, each covering a different part
 | `1514`, `1515` | Kept open, limited to the trusted subnet (DOCKER-USER)| Required for remote agents to forward events and enroll |
 | `514/udp` | Kept open, limited to the trusted subnet (DOCKER-USER), or removed if unused | Required exclusively for external syslog ingestion |
 | `443` (Dashboard) | Optional loopback binding | Depends on whether the dashboard is accessed remotely |
+
 
 #### Loopback binding of the Management Ports
 
@@ -181,7 +215,6 @@ Local functionality and API responsiveness from the host were confirmed:
 ```
 >**Note on expected result:**
 > After the loopback binding, ports 9200 and 55000 are listed with `127.0.0.1` instead of `0.0.0.0` and `[::]` in the `ss` output, while 443, 1514, 1515 and 514 remain unchanged. A connection attempt to the indexer API from another machine on the network, such as `curl -k https://<host>:9200`, is expected to fail with a refused or timed-out connection.
-
 
 
 ### 3. Restricting Access with a Host Firewall (ufw)
@@ -449,7 +482,7 @@ Connection to <HOST_LAN_IP> port 1514 [tcp/fujitsu-dtcns] succeeded!
 
 ## Summary of Hardening Measures
 
-- **Credentials:** The default password and hash of the indexer `admin` user were replaced. The default credentials of the `kibanaserver` and `wazuh-wui` users were not changed in this lab. This is documented as an accepted risk: the management APIs are bound to the loopback interface, and the dashboard is reachable only from a trusted network. For any shared or production deployment, both credentials should be replaced with the same procedure as for `admin`.
+- **Credentials:** the default password and hash of the indexer `admin` user were replaced, and so was the default password of the API user `wazuh-wui`. The default credentials of the `kibanaserver` user were not changed in this lab. This is documented as an accepted risk: the management APIs are bound to the loopback interface. For any shared or production deployment, this credential should be replaced as well.
 - **Management ports and dashboard (9200, 55000, 443):** These ports are bound to the loopback interface in docker-compose.yml ("127.0.0.1:9200:9200", "127.0.0.1:55000:55000" and "127.0.0.1:443:5601") and are therefore no longer reachable from other hosts on the network. They remain accessible from the host itself, and internal communication between the containers is unaffected.
 - **Agent and syslog ports (1514/TCP, 1515/TCP, 514/UDP):** These ports remain reachable for agents and syslog sources, but only from the trusted subnet. The restriction is enforced through `DOCKER-USER` rules in `/etc/ufw/after.rules` and applies to IPv4 traffic arriving on the configured LAN interface.
 - **Host firewall:** `ufw` blocks unsolicited incoming connections to services running directly on the host (default-deny inbound policy, with SSH allowed only from the trusted subnet) and keeps the `DOCKER-USER` rules together with the other firewall rules in `/etc/ufw/after.rules`. It does not filter Docker-published ports.
