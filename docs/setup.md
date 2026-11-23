@@ -14,7 +14,7 @@ To run the containerized Wazuh stack reliably, the official baseline requirement
 
 #### Lab Environment
 
-* **OS:** Ubuntu 24.04.6 LTS
+* **OS:** Ubuntu 20.04.6 LTS
 * **Hardware:** 4 CPU cores, 16 GB RAM, 512 GB SSD
 * **Stack:** Wazuh v4.14.8 (Single-Node Docker Compose)
 
