@@ -1,6 +1,7 @@
 # Wazuh 4.14.8 Single-Node Docker Homelab
 
-A centralized Security Information and Event Management (SIEM) and Extended Detection and Response (XDR) deployment running **Wazuh v4.14.8** in Docker containers. The environment aggregates endpoint telemetry, monitors file integrity, and maps real-time threat detections to the **MITRE ATT&CK** matrix.
+This project demonstrates the deployment of a centralized Security Information and Event Management (SIEM) and Extended Detection and Response (XDR) platform using **Wazuh 4.14.8** running entirely in Docker containers. The environment is configured to aggregate endpoint telemetry, monitor system integrity, and enable real-time threat detection mapped to the **MITRE ATT&CK** matrix.
+
 
 ## Architecture & Lab Environment
 
