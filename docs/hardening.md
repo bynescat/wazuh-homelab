@@ -1,5 +1,5 @@
 
-### Security Considerations
+## Security Considerations
 
 The default single-node deployment publishes all service ports on every network interface (`0.0.0.0`) and ships with default credentials. This is acceptable for an isolated lab, but would require hardening in any shared or production environment.
 
