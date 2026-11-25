@@ -427,7 +427,7 @@ nc -zv -G 5 <HOST_LAN_IP> 1514
 Connection to <HOST_LAN_IP> port 1514 [tcp/fujitsu-dtcns] succeeded!
 ```
 
-The connection succeeded. (`fujitsu-dtcns` is only the service name that `nc` looks up for port 1514 and has no meaning here.)
+The connection succeeded. (`fujitsu-dtcns` is only the service name that `nc` looks up for port 1514 and has no meaning here.
 
 
 As proof that the `DOCKER-USER` chain takes effect on published container ports, a temporary rule blocking the test device (in this case, a Mac) was inserted on the Wazuh host:
@@ -448,7 +448,7 @@ nc -zvw3 <HOST_LAN_IP> 1514
 nc: connectx to <HOST_LAN_IP> port 1514 (tcp) failed: Operation timed out
 ```
 
-This successful connection also shows that the network path between the two devices works. The timeouts on ports 9200 and 55000 therefore result from the restrictions and not from a connectivity problem.
+The connection timed out, so the temporary `DOCKER-USER` rule takes effect on the published container port.
 
 
 The packet counter of the temporary rule was checked, and the rule was removed again. The rule must be deleted with exactly the same parameters it was inserted with:
