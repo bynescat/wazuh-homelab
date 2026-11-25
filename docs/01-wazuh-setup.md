@@ -74,7 +74,10 @@ ls config/wazuh_indexer_ssl_certs/
 **Output:**
 
 ```text
-<paste your real output here>
+admin-key.pem	     root-ca-manager.pem      wazuh.indexer-key.pem
+admin.pem	     root-ca.pem	      wazuh.indexer.pem
+root-ca.key	     wazuh.dashboard-key.pem  wazuh.manager-key.pem
+root-ca-manager.key  wazuh.dashboard.pem      wazuh.manager.pem
 ```
 
 ### 5. Starting the Container Stack
