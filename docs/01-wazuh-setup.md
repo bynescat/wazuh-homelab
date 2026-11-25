@@ -57,12 +57,24 @@ sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
 docker compose version
 ```
 
-### 4. Generating SSL Certificates
+### 4. Generating TLS Certificates
 
-Wazuh requires encrypted internal TLS communication across its core components (Manager, Indexer, and Dashboard). The official certificate generator helper was executed to automatically create the required SSL/TLS keys and configuration files within Docker volumes:
+Wazuh requires encrypted internal TLS communication across its core components (Manager, Indexer, and Dashboard). The official certificate generator was executed to create the required certificates and keys in `config/wazuh_indexer_ssl_certs/`:
 
 ```bash
 sudo docker compose -f generate-indexer-certs.yml run --rm generator
+```
+
+The generated files were listed to confirm the result:
+
+```bash
+ls config/wazuh_indexer_ssl_certs/
+```
+
+**Output:**
+
+```text
+<paste your real output here>
 ```
 
 ### 5. Starting the Container Stack
