@@ -10,7 +10,7 @@ The following topics are covered:
 - generating failed SSH logins (for an existing and for a non-existent user) and a privileged `sudo` session
 - reading the corresponding raw lines in the authentication log of the VM
 - locating the same events as alerts in the Wazuh dashboard, with rule, severity, extracted fields and MITRE ATT&CK mapping
-- counting the failed logins per source address from the raw log with `grep` and `awk`
+- counting the failed logins per source address from the raw log with `grep`, `cut`, `sort` and `uniq`
 
 Other log sources of the VM, such as system messages, kernel messages and service errors, are not covered here.
 
