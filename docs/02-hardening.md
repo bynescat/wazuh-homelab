@@ -162,7 +162,7 @@ The network exposure was reduced in three layers, each covering a different part
 | `55000` (Manager API) | Bound to `127.0.0.1` | Required locally only; accessed internally by the dashboard |
 | `1514`, `1515` | Kept open, limited to the trusted subnet (DOCKER-USER)| Required for remote agents to forward events and enroll |
 | `514/udp` | Kept open, limited to the trusted subnet (DOCKER-USER), or removed if unused | Required exclusively for external syslog ingestion |
-| `443` (Dashboard) | Bound to `127.0.0.1` (after the tests below) | The dashboard is opened only from the host itself |
+| `443` (Dashboard) | Bound to `127.0.0.1` | The dashboard is opened only from the host itself |
 
 
 #### Loopback binding of the Management Ports
@@ -187,10 +187,11 @@ To edit the port mappings, the configuration file was opened in the text editor:
 nano docker-compose.yml
 ```
 
-The port mappings of the indexer API and the manager API were changed so that they bind strictly to the loopback interface:
+The port mappings of the indexer API, the manager API and the dashboard were changed so that they bind strictly to the loopback interface:
 
 - "9200:9200" to - "127.0.0.1:9200:9200"
 - "55000:55000" to - "127.0.0.1:55000:55000"
+- "443:5601" to - "127.0.0.1:443:5601"
 
 3. **Validation and restart**
 
@@ -198,8 +199,6 @@ The port mappings of the indexer API and the manager API were changed so that th
 sudo docker compose config --quiet && echo OK
 sudo docker compose up -d
 ```
->**Note on binding the dashboard:**
->(443:5601) to 127.0.0.1:443:5601 is an optional further measure. It is suitable only if the dashboard is opened exclusively from the host itself; where remote administrators need access, the dashboard remains published, and access is limited by other means.
 
 The expected operational status and listening ports were verified and recorded:
 
@@ -214,7 +213,7 @@ Local functionality and API responsiveness from the host were confirmed:
   curl -k -u admin https://localhost:9200 
 ```
 >**Note on expected result:**
-> After the loopback binding, ports 9200 and 55000 are listed with `127.0.0.1` instead of `0.0.0.0` and `[::]` in the `ss` output, while 443, 1514, 1515 and 514 remain unchanged. A connection attempt to the indexer API from another machine on the network, such as `curl -k https://<host>:9200`, is expected to fail with a refused or timed-out connection.
+> After the loopback binding, ports 9200, 55000 and 443 are listed with `127.0.0.1` instead of `0.0.0.0` and `[::]` in the `ss` output, while 1514, 1515 and 514 remain unchanged.
 
 
 ### 3. Restricting Access with a Host Firewall (ufw)
@@ -396,7 +395,7 @@ The listening ports were recorded after the changes:
 sudo ss -tulnp | grep -E ':(9200|55000|443|1514|1515|514)\b' | tee ~/ports-after.txt
 ```
 
-At this stage, ports 9200 and 55000 are bound to `127.0.0.1`, while 443, 1514, 1515 and 514 remain published on all interfaces.
+Ports 9200, 55000 and 443 are bound to `127.0.0.1`, while 1514, 1515 and 514 remain published on all interfaces. The latter are restricted by the `DOCKER-USER` rules from step 5.
 
 **Connection tests from a second device**
 
@@ -436,6 +435,7 @@ As proof that the `DOCKER-USER` chain takes effect on published container ports,
 ```bash
 sudo iptables -I DOCKER-USER 1 -i <YOUR_LAN_IFACE> -p tcp --dport 1514 -s <<MAC_IP>> -j DROP
 ```
+
 Check on Mac, if the command will be blocked as expected:
 
 ```bash
@@ -448,19 +448,7 @@ nc -zvw3 <HOST_LAN_IP> 1514
 nc: connectx to <HOST_LAN_IP> port 1514 (tcp) failed: Operation timed out
 ```
 
-As a control test, the dashboard port was checked from the same device, to show that the Wazuh host itself is reachable:
-
-```bash
-curl -k -s -o /dev/null -w "%{http_code}\n" --connect-timeout 5 https://<HOST_LAN_IP>
-```
-
-**Output:**
-
-```text
-302
-```
-
-The dashboard responded with a redirect (to its login page), so the network path between the two devices works. The timeouts on ports 9200 and 55000 therefore result from the restrictions and not from a connectivity problem.
+This successful connection also shows that the network path between the two devices works. The timeouts on ports 9200 and 55000 therefore result from the restrictions and not from a connectivity problem.
 
 
 The packet counter of the temporary rule was checked, and the rule was removed again. The rule must be deleted with exactly the same parameters it was inserted with:
