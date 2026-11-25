@@ -14,7 +14,7 @@ The following topics are covered:
 
 Other log sources of the VM, such as system messages, kernel messages and service errors, are not covered here.
 
-a
+
 ## 1. Generating authentication events
 
 Failed SSH logins were generated from a terminal on the host against the host-only address of the VM. Two cases were tested, because they leave different traces in the log: a wrong password for an existing account (`nescat`) and a login attempt with a user name that does not exist on the VM (`wronguser`). In both cases, three wrong passwords were entered:
