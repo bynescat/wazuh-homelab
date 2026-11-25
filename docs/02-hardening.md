@@ -150,7 +150,7 @@ All three containers were running. The change was verified with a login to the A
 
 The network exposure was reduced in three layers, each covering a different part of the attack surface:
 
-- **Loopback binding:** ports 9200 and 55000 are bound to 127.0.0.1, so the indexer API and the manager API are no longer reachable from other hosts on the network. They remain accessible from the laptop itself and from other containers on the compose network.
+- **Loopback binding:** ports 9200, 55000 and 443 are bound to 127.0.0.1, so the indexer API, the manager API and the dashboard are no longer reachable from other hosts on the network. They remain accessible from the laptop itself and from other containers on the compose network.
 - **DOCKER-USER rules:** the ports that must stay reachable (1514/TCP, 1515/TCP and 514/UDP) are limited to the trusted subnet. Docker-published ports bypass ufw, so these must be filtered in the DOCKER-USER chain. Only published ports that must stay reachable but should not be open to everyone need a DOCKER-USER rule.
 - **ufw:** covers services running directly on the host (such as SSH) and sets a default-deny inbound policy for them. It does not filter Docker-published ports.
 
