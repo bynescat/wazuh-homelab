@@ -19,7 +19,7 @@ This project demonstrates the deployment of a centralized Security Information a
 
 - **Credential Rotation:** Replaced the default OpenSearch indexer `admin` password and regenerated hashes via `securityadmin.sh` (with `kibanaserver` documented as an accepted lab risk behind loopback bindings).
 - **Loopback Isolation:** Bound management and UI ports (`9200`, `55000`, `443`) to `127.0.0.1` in `docker-compose.yml` so administrative interfaces are unreachable from the local network.
-- **Docker-Aware Firewalling:** Configured `ufw` with a default-deny inbound policy and enforced subnet-level filtering (`192.168.1.0/24`) on agent/syslog ports (`1514`, `1515`, `514/udp`) via persistent `DOCKER-USER` iptables rules in `/etc/ufw/after.rules` (bypassing Docker's `FORWARD` chain NAT behavior).
+- **Docker-Aware Firewalling:** Configured `ufw` with a default-deny inbound policy and enforced subnet-level filtering on agent/syslog ports (`1514`, `1515`, `514/udp`) via persistent `DOCKER-USER` iptables rules in `/etc/ufw/after.rules` (bypassing Docker's `FORWARD` chain NAT behavior).
 
 ## Documentation
 
