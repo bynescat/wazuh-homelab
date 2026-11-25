@@ -162,7 +162,7 @@ The network exposure was reduced in three layers, each covering a different part
 | `55000` (Manager API) | Bound to `127.0.0.1` | Required locally only; accessed internally by the dashboard |
 | `1514`, `1515` | Kept open, limited to the trusted subnet (DOCKER-USER)| Required for remote agents to forward events and enroll |
 | `514/udp` | Kept open, limited to the trusted subnet (DOCKER-USER), or removed if unused | Required exclusively for external syslog ingestion |
-| `443` (Dashboard) | Optional loopback binding | Depends on whether the dashboard is accessed remotely |
+| `443` (Dashboard) | Bound to `127.0.0.1` (after the tests below) | The dashboard is opened only from the host itself |
 
 
 #### Loopback binding of the Management Ports
@@ -396,7 +396,7 @@ The listening ports were recorded after the changes:
 sudo ss -tulnp | grep -E ':(9200|55000|443|1514|1515|514)\b' | tee ~/ports-after.txt
 ```
 
-Ports 9200 and 55000 are bound to `127.0.0.1`, while 443, 1514, 1515 and 514 remain published on all interfaces. The latter are restricted by the `DOCKER-USER` rules from step 5.
+At this stage, ports 9200 and 55000 are bound to `127.0.0.1`, while 443, 1514, 1515 and 514 remain published on all interfaces.
 
 **Connection tests from a second device**
 
