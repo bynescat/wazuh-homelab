@@ -35,7 +35,6 @@ sudo grep -aE "Invalid user|Failed password" /var/log/auth.log | tail -n 10
 **Output:**
 
 ```text
-2026-11-17T16:29:07.068176+00:00 lab sshd[1490]: Invalid user wazuh-agent-vm from 10.0.2.2 port 53274
 2026-11-18T11:03:29.663357+00:00 lab sshd[6136]: Failed password for nescat from 192.168.56.1 port 34642 ssh2
 2026-11-18T11:03:40.052316+00:00 lab sshd[6136]: message repeated 2 times: [ Failed password for nescat from 192.168.56.1 port 34642 ssh2]
 2026-11-18T11:04:10.127069+00:00 lab sshd[6143]: Invalid user wronguser from 192.168.56.1 port 37932
