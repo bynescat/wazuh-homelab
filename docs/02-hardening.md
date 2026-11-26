@@ -123,7 +123,7 @@ bash /usr/share/wazuh-indexer/plugins/opensearch-security/tools/securityadmin.sh
 
 #### Changing the password of the API user
 
-The user `wazuh-wui` is used by the dashboard to talk to the manager API and by the scripts of chapter 06. Its default password is published in the Wazuh documentation, so it was replaced as well. Backups of the two files that contain it were created first:
+The user `wazuh-wui` is used by the dashboard to talk to the manager API. Its default password is published in the Wazuh documentation, so it was replaced as well. Backups of the two files that contain it were created first:
 
 ```bash
 cp .env .env.bak
