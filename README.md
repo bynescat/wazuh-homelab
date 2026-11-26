@@ -26,7 +26,7 @@ This project demonstrates the deployment of a centralized Security Information a
 - **[Deployment & Installation Guide](docs/01-wazuh-setup.md):** Host kernel tuning (`vm.max_map_count`), Docker Compose v2 plugin setup, TLS certificate generation, and container stack deployment.
 - **[Hardening & Network Restriction Guide](docs/02-hardening.md):** Credential rotation, loopback port bindings, `ufw` + `DOCKER-USER` firewall rules, and network verification tests.
 - **[Monitored Linux VM](docs/03-monitored-vm.md):** VirtualBox Ubuntu Server 24.04 as monitored endpoint, host-only networking, SSH access over a restricted NAT port forward, and connectivity checks to the Wazuh manager.
-- **[Wazuh Agent Installation](docs/04-wazuh-agent.md):** Version-matched agent installation from the official repository, pinning, enrollment, and verification on both the agent and the manager.
+- **[Wazuh Agent Installation](docs/04-wazuh-agent.md):** Version-matched agent installation from the official repository, pinning, enrollment, and verification.
 - **[Linux Log Analysis](docs/05-log-analysis.md):** Authentication events in `/var/log/auth.log` and in the Wazuh dashboard, with `grep`-based counting of failed logins per source address.
 
 ## Quick Overview
