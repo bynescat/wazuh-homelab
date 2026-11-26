@@ -140,6 +140,33 @@ sudo tail -n 20 /var/ossec/logs/ossec.log
 
 The excerpt shows the rootcheck scan, the log collector, the security configuration assessment (SCA) with the CIS benchmark for Ubuntu 24.04, the system inventory (syscollector) and the first scan of the file integrity monitoring (FIM).
 
+### 6. Verifying the agent on the manager
+
+Step 5 confirmed the connection from the side of the agent. The same connection was then checked from the side of the manager. The manager runs in a container, so the command was run on the host with `docker exec`, which executes a command inside a running container:
+
+```bash
+sudo docker exec single-node-wazuh.manager-1 /var/ossec/bin/agent_control -l
+```
+
+**Output:**
+
+```text
+Wazuh agent_control. List of available agents:
+   ID: 000, Name: wazuh.manager (server), IP: 127.0.0.1, Active/Local
+   ID: 001, Name: lab, IP: any, Active
+
+List of agentless devices:
+```
+
+The output confirms the following:
+
+- **Manager:** the entry with the ID `000` is the manager itself. `Active/Local` means that it monitors its own container.
+- **Agent:** the VM is registered under the ID `001` with the name `lab`, which was taken from its hostname during the enrollment (step 5). The status `Active` means that the manager currently receives data from it.
+- **IP address `any`:** the agent was not bound to a fixed source address during the enrollment, so the manager accepts its connection from any address. In this lab, the exposure is limited by the firewall rules of the host (see [03 Monitored VM](03-monitored-vm.md), step 10).
+- **Agentless devices:** the list is empty. Agentless monitoring, which checks devices without an installed agent, is not used in this lab.
+
+The connection is therefore confirmed from both sides: the agent reports a connection to the manager, and the manager lists the agent as active.
+
 ## Sources
 
 - [Deploying Wazuh agents on Linux endpoints](https://documentation.wazuh.com/4.14/installation-guide/wazuh-agent/wazuh-agent-package-linux.html) (Wazuh documentation)
